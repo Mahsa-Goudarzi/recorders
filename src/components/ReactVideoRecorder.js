@@ -12,7 +12,7 @@ const ReactVideoRecorder = () => {
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
-  const [cameraModeFront, setCameraModeFront] = useState(true);
+  const [cameraMode, setCameraMode] = useState("user");
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
@@ -21,7 +21,7 @@ const ReactVideoRecorder = () => {
         const videoConstraints = {
           audio: false,
           video: {
-            facingMode: cameraModeFront ? "user" : "environment",
+            facingMode: cameraMode,
           },
         };
         const audioConstraints = { audio: true };
@@ -91,21 +91,13 @@ const ReactVideoRecorder = () => {
                 Start Recording
               </button>
               <button
-                onClick={() => {
-                  setCameraModeFront(false);
-                  getCameraPermission();
+                onClick={async () => {
+                  setCameraMode((prev) =>
+                    prev === "user" ? "environment" : "user"
+                  );
+                  await getCameraPermission();
                 }}
-              >
-                Back Camera
-              </button>
-              <button
-                onClick={() => {
-                  setCameraModeFront(true);
-                  getCameraPermission();
-                }}
-              >
-                Front Camera
-              </button>
+              >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button>
             </div>
           ) : null}
           {recordingStatus === "recording" ? (
