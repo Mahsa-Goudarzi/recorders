@@ -13,17 +13,18 @@ const ReactVideoRecorder = () => {
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
   const [cameraMode, setCameraMode] = useState("user");
+  const constraints = {
+    audio: false,
+    video: {
+      facingMode: cameraMode,
+    },
+  };
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
     if ("MediaRecorder" in window) {
       try {
-        const videoConstraints = {
-          audio: false,
-          video: {
-            facingMode: cameraMode,
-          },
-        };
+        const videoConstraints = constraints;
         const audioConstraints = { audio: true };
         // create audio and video streams separately
         const audioStream = await navigator.mediaDevices.getUserMedia(
