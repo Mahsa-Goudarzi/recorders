@@ -12,7 +12,7 @@ const ReactVideoRecorder = () => {
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
-  const [cameraMode, setCameraMode] = useState("environment");
+  const [cameraMode, setCameraMode] = useState("user");
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
@@ -76,7 +76,7 @@ const ReactVideoRecorder = () => {
   };
 
   return (
-    <div style={{ maxWidth: "100vw" }}>
+    <div>
       <h2>Video Recorder</h2>
       <main>
         <div className="video-controls">
