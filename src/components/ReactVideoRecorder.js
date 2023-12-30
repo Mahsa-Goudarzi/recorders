@@ -12,7 +12,7 @@ const ReactVideoRecorder = () => {
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
-  const [cameraModeFront, setCameraModeFront] = useState(false);
+  const [cameraModeFront, setCameraModeFront] = useState(true);
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
