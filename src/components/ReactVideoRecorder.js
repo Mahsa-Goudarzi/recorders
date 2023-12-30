@@ -1,3 +1,5 @@
+////https://blog.logrocket.com/how-to-create-video-audio-recorder-react/#:~:text=The%20MediaRecorder%20API,-To%20record%20audio&text=To%20obtain%20a%20MediaStream%20object,captureStream()%20.
+
 import { useState, useRef } from "react";
 
 const mimeType = "video/webm";
@@ -10,6 +12,7 @@ const ReactVideoRecorder = () => {
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
+  const [cameraMode, setCameraMode] = useState("environment");
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
@@ -17,7 +20,9 @@ const ReactVideoRecorder = () => {
       try {
         const videoConstraints = {
           audio: false,
-          video: true,
+          video: {
+            facingMode: cameraMode,
+          },
         };
         const audioConstraints = { audio: true };
         // create audio and video streams separately
@@ -71,7 +76,7 @@ const ReactVideoRecorder = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "100vw" }}>
       <h2>Video Recorder</h2>
       <main>
         <div className="video-controls">
@@ -81,9 +86,18 @@ const ReactVideoRecorder = () => {
             </button>
           ) : null}
           {permission && recordingStatus === "inactive" ? (
-            <button onClick={startRecording} type="button">
-              Start Recording
-            </button>
+            <div>
+              <button onClick={startRecording} type="button">
+                Start Recording
+              </button>
+              <button
+                onClick={() =>
+                  cameraMode === "user"
+                    ? setCameraMode("environment")
+                    : setCameraMode("user")
+                }
+              >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button>
+            </div>
           ) : null}
           {recordingStatus === "recording" ? (
             <button onClick={stopRecording} type="button">
