@@ -93,10 +93,10 @@ const ReactVideoRecorder = () => {
               </button>
               <button
                 onClick={() => {
-                  stopRecording();
                   cameraMode === "user"
                     ? setCameraMode("environment")
                     : setCameraMode("user");
+                  getCameraPermission();
                 }}
               >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button>
             </div>
