@@ -12,19 +12,18 @@ const ReactVideoRecorder = () => {
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
-  const [cameraMode, setCameraMode] = useState("user");
-  const constraints = {
-    audio: false,
-    video: {
-      facingMode: cameraMode,
-    },
-  };
+  const [cameraModeFront, setCameraModeFront] = useState(false);
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
     if ("MediaRecorder" in window) {
       try {
-        const videoConstraints = constraints;
+        const videoConstraints = {
+          audio: false,
+          video: {
+            facingMode: cameraModeFront ? "user" : "environment",
+          },
+        };
         const audioConstraints = { audio: true };
         // create audio and video streams separately
         const audioStream = await navigator.mediaDevices.getUserMedia(
@@ -93,12 +92,12 @@ const ReactVideoRecorder = () => {
               </button>
               <button
                 onClick={() => {
-                  cameraMode === "user"
-                    ? setCameraMode("environment")
-                    : setCameraMode("user");
+                  cameraModeFront === "user"
+                    ? setCameraModeFront("environment")
+                    : setCameraModeFront("user");
                   getCameraPermission();
                 }}
-              >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button>
+              >{`${cameraModeFront ? "Back" : "Front"} Camera`}</button>
             </div>
           ) : null}
           {recordingStatus === "recording" ? (
