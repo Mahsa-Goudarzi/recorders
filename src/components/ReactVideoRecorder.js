@@ -92,9 +92,7 @@ const ReactVideoRecorder = () => {
               </button>
               <button
                 onClick={() => {
-                  cameraModeFront === "user"
-                    ? setCameraModeFront("environment")
-                    : setCameraModeFront("user");
+                  setCameraModeFront((prev) => !prev);
                   getCameraPermission();
                 }}
               >{`${cameraModeFront ? "Back" : "Front"} Camera`}</button>
