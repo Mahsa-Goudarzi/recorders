@@ -1,10 +1,8 @@
-//https://blog.logrocket.com/how-to-create-video-audio-recorder-react/#:~:text=The%20MediaRecorder%20API,-To%20record%20audio&text=To%20obtain%20a%20MediaStream%20object,captureStream()%20.
-
 import { useState, useRef, useEffect } from "react";
 
 const mimeType = "audio/webm";
 
-const AudioCapture = () => {
+const ReactAudioRecorder = () => {
   const mediaRecorder = useRef(null);
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState(null);
@@ -95,7 +93,7 @@ const AudioCapture = () => {
     return () => {
       clearTimeout(timerId);
     };
-  }, [timer, startTime]);
+  }, [timer, startTime, recordingStatus]);
 
   return (
     <div>
@@ -136,4 +134,4 @@ const AudioCapture = () => {
     </div>
   );
 };
-export default AudioCapture;
+export default ReactAudioRecorder;

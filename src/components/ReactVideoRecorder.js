@@ -1,6 +1,4 @@
-////https://blog.logrocket.com/how-to-create-video-audio-recorder-react/#:~:text=The%20MediaRecorder%20API,-To%20record%20audio&text=To%20obtain%20a%20MediaStream%20object,captureStream()%20.
-
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const mimeType = "video/webm";
 
@@ -9,10 +7,15 @@ const ReactVideoRecorder = () => {
   const liveVideoFeed = useRef(null);
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState(null);
+  //sets the current recording status of the recorder. The three possible values are recording, inactive, and paused
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [videoChunks, setVideoChunks] = useState([]);
   const [recordedVideo, setRecordedVideo] = useState(null);
+  const [timer, setTimer] = useState(0); // Add timer state
+  const [startTime, setStartTime] = useState(null);
   const [cameraMode, setCameraMode] = useState("user");
+  // constants
+  const maxRecordingTimeSeconds = 10;
 
   const getCameraPermission = async () => {
     setRecordedVideo(null);
@@ -21,6 +24,8 @@ const ReactVideoRecorder = () => {
         const videoConstraints = {
           audio: false,
           video: {
+            width: { min: 160, ideal: 270, max: 640 },
+            height: { min: 240, ideal: 480, max: 480 },
             facingMode: cameraMode,
           },
         };
@@ -51,9 +56,16 @@ const ReactVideoRecorder = () => {
 
   const startRecording = async () => {
     setRecordingStatus("recording");
-    const media = new MediaRecorder(stream, { mimeType });
+    //create new Media recorder instance using the stream
+    const media = new MediaRecorder(stream);
+    //set the MediaRecorder instance to the mediaRecorder ref
     mediaRecorder.current = media;
+    //invokes the start method to start the recording process
     mediaRecorder.current.start();
+
+    // Start the timer
+    setStartTime(Date.now());
+
     let localVideoChunks = [];
     mediaRecorder.current.ondataavailable = (event) => {
       if (typeof event.data === "undefined") return;
@@ -66,63 +78,98 @@ const ReactVideoRecorder = () => {
   const stopRecording = () => {
     setPermission(false);
     setRecordingStatus("inactive");
+    setTimer(0);
+    //stops the recording instance
     mediaRecorder.current.stop();
     mediaRecorder.current.onstop = () => {
+      //creates a blob file from the audiochunks data
       const videoBlob = new Blob(videoChunks, { type: mimeType });
+      //creates a playable URL from the blob file.
       const videoUrl = URL.createObjectURL(videoBlob);
       setRecordedVideo(videoUrl);
       setVideoChunks([]);
     };
   };
 
+  const handleSubmit = async () => {
+    const videoBlob = await fetch(recordedVideo).then((r) => r.blob());
+    const videoFile = new File([videoBlob], "video.webm", { type: mimeType });
+
+    // Now send the video file to database!
+  };
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      const passedTime = startTime ? Date.now() - startTime : 0;
+      setTimer(passedTime / 1000);
+    }, 1000);
+
+    if (timer >= maxRecordingTimeSeconds) {
+      stopRecording();
+      clearTimeout(timerId);
+    }
+
+    if (recordingStatus !== "recording") {
+      // Clear timerId and stop the timer when recording ends
+      clearTimeout(timerId);
+    }
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [timer, startTime, recordingStatus]);
+
   return (
     <div>
       <h2>Video Recorder</h2>
       <main>
         <div className="video-controls">
-          {!permission ? (
+          {!permission && (
             <button onClick={getCameraPermission} type="button">
               Get Camera
             </button>
-          ) : null}
+          )}
           {permission && recordingStatus === "inactive" ? (
             <div>
               <button onClick={startRecording} type="button">
                 Start Recording
               </button>
-              <button
+              {/* <button
                 onClick={async () => {
                   setCameraMode((prev) =>
                     prev === "user" ? "environment" : "user"
                   );
                   await getCameraPermission();
                 }}
-              >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button>
+              >{`${cameraMode === "user" ? "Back" : "Front"} Camera`}</button> */}
             </div>
           ) : null}
-          {recordingStatus === "recording" ? (
-            <button onClick={stopRecording} type="button">
-              Stop Recording
-            </button>
+          {recordingStatus === "recording" && (
+            <>
+              <button onClick={stopRecording} type="button">
+                Stop Recording
+              </button>
+              {timer <= 10 && <div>{timer} seconds</div>}
+            </>
+          )}
+        </div>
+        <div className="video-player">
+          {!recordedVideo ? (
+            <video ref={liveVideoFeed} autoPlay className="live-player"></video>
+          ) : null}
+          {recordedVideo ? (
+            <div className="recorded-player">
+              <video className="recorded" src={recordedVideo} controls></video>
+              <div>
+                <a download href={recordedVideo}>
+                  Download Recording
+                </a>
+              </div>
+              <input type="submit" onClick={handleSubmit} />
+            </div>
           ) : null}
         </div>
       </main>
-
-      <div className="video-player">
-        {!recordedVideo ? (
-          <video ref={liveVideoFeed} autoPlay className="live-player"></video>
-        ) : null}
-        {recordedVideo ? (
-          <div className="recorded-player">
-            <video className="recorded" src={recordedVideo} controls></video>
-            <div>
-              <a download href={recordedVideo}>
-                Download Recording
-              </a>
-            </div>
-          </div>
-        ) : null}
-      </div>
     </div>
   );
 };
