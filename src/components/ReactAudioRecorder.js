@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-const mimeType = "audio/webm";
+const mimeType = "audio/mp3";
 
 const ReactAudioRecorder = () => {
   const mediaRecorder = useRef(null);
@@ -69,7 +69,7 @@ const ReactAudioRecorder = () => {
 
   const handleSubmit = async () => {
     const audioBlob = await fetch(audio).then((r) => r.blob());
-    const audioFile = new File([audioBlob], "voice.webm", { type: mimeType });
+    const audioFile = new File([audioBlob], "voice.mp3", { type: mimeType });
 
     // Now send the audio file to database!
   };
