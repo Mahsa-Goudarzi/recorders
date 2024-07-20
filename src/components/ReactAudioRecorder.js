@@ -80,10 +80,10 @@ const ReactAudioRecorder = () => {
       setTimer(passedTime / 1000);
     }, 1000);
 
-    if (timer >= maxRecordingTimeSeconds) {
-      stopRecording();
-      clearTimeout(timerId);
-    }
+    // if (timer >= maxRecordingTimeSeconds) {
+    //   stopRecording();
+    //   clearTimeout(timerId);
+    // }
 
     if (recordingStatus !== "recording") {
       // Clear timerId and stop the timer when recording ends
