@@ -115,7 +115,7 @@ const ReactAudioRecorder = () => {
               <button onClick={stopRecording} type="button">
                 Stop Recording
               </button>
-              {timer <= 10 && <div>{timer} seconds</div>}
+              <div>{timer} seconds</div>
             </>
           )}
         </div>
